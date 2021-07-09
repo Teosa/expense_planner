@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AddTransactionWidget extends StatefulWidget {
   final Function _addRecord;
@@ -11,26 +12,42 @@ class AddTransactionWidget extends StatefulWidget {
 
 class _AddTransactionWidgetState extends State<AddTransactionWidget> {
   final _titleController = TextEditingController();
-
   final _amountController = TextEditingController();
+  final _dateController = TextEditingController();
+  DateTime _selectedDate;
 
   void _prepareAndAddRecord() {
     final title = _titleController.text;
     final amountText = _amountController.text;
+    final date = _dateController.text;
 
-    if(title.isEmpty || amountText.isEmpty) {
+    if (title.isEmpty || amountText.isEmpty || date.isEmpty) {
       return;
     }
 
-    final amount =  double.parse(amountText);
+    final amount = double.parse(amountText);
 
-    if(amount <= 0) {
+    if (amount <= 0) {
       return;
     }
 
-    widget._addRecord(title, amount);
+    widget._addRecord(title, amount, _selectedDate);
 
     Navigator.of(context).pop();
+  }
+
+  void _showDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1990),
+      lastDate: DateTime.now(),
+    ).then((value) {
+      if(value != null) {
+        _selectedDate = value;
+        _dateController.text = DateFormat.yMMMMd("ru").format(value);
+      }
+    });
   }
 
   @override
@@ -51,6 +68,7 @@ class _AddTransactionWidgetState extends State<AddTransactionWidget> {
               inputType: TextInputType.number,
               onSubmit: _prepareAndAddRecord,
             ),
+            _DateField(_showDatePicker, _dateController),
             _AddTransactionButton(_prepareAndAddRecord),
           ],
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -97,7 +115,52 @@ class _AddTransactionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       child: Text("Добавить"),
+      style: OutlinedButton.styleFrom(
+        backgroundColor: Theme.of(context).primaryColor,
+        primary: Theme.of(context).textTheme.button.color,
+      ),
       onPressed: _addRecord,
+    );
+  }
+}
+
+class _DateField extends StatelessWidget {
+  final Function _showDatePicker;
+  final TextEditingController _dateController;
+
+  _DateField(this._showDatePicker, this._dateController);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 2,
+            child: TextField(
+              controller: _dateController,
+              enabled: false,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Дата",
+              ),
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 1,
+            child: TextButton(
+              onPressed: _showDatePicker,
+              child: Text("Выбрать дату"),
+              style: TextButton.styleFrom(
+                  primary: Theme.of(context).textTheme.button.color),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -17,15 +17,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.teal,
         accentColor: Colors.deepOrange,
         fontFamily: "Quicksand",
         textTheme: ThemeData.light().textTheme.copyWith(
-            title: TextStyle(
-                fontFamily: "OpenSans",
-                fontSize: 20,
+              title: TextStyle(
+                  fontFamily: "OpenSans",
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+              button: TextStyle(
                 color: Colors.black,
-                fontWeight: FontWeight.bold)),
+              ),
+            ),
         appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(
                 title: TextStyle(
@@ -46,14 +50,20 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
 
-  void _addRecord(String title, double amount) {
+  void _addRecord(String title, double amount, DateTime date) {
     setState(() => _transactions.insert(
         0,
         Transaction(
             id: _transactions.length + 1,
             title: title,
             amount: amount,
-            date: DateTime.now())));
+            date: date
+        )));
+  }
+
+  void _removeRecord(Transaction transaction) {
+    //_transactions.removeWhere((element) => false);
+    setState(() => _transactions.remove(transaction));
   }
 
   void _showForm(BuildContext buildContext) {
@@ -91,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             Chart(_recentTransactions),
-            TransactionsListWidget(_transactions),
+            TransactionsListWidget(_transactions, _removeRecord),
           ],
         ),
       ),

@@ -26,7 +26,8 @@ class Chart extends StatelessWidget {
       }
 
       return ChartRecord(DateFormat.E().format(weekDay), totalSum);
-    });
+    })
+    .reversed.toList();
   }
 
   double get _overallSum {
@@ -48,7 +49,6 @@ class Chart extends StatelessWidget {
       width: double.infinity,
       child: Card(
           elevation: 6,
-          //color: Colors.orange,
           margin: EdgeInsets.all(20),
           child: Container(
             padding: EdgeInsets.all(10),
