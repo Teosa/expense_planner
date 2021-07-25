@@ -12,7 +12,6 @@ class TransactionsListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
       child: _getChild(context),
     );
   }
@@ -26,23 +25,25 @@ class TransactionsListWidget extends StatelessWidget {
         itemCount: _transactions.length,
       );
     } else {
-      return Column(
-        children: [
-          Text(
-            "No transaction added yet",
-            style: Theme.of(context).textTheme.title,
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Container(
-              height: 200,
-              child: Image.asset(
-                "resources/images/waiting.png",
-                fit: BoxFit.cover,
-              )),
-        ],
-      );
+      return LayoutBuilder(builder: (ctx, constraints) {
+        return Column(
+          children: [
+            Text(
+              "No transaction added yet",
+              style: Theme.of(context).textTheme.title,
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+                height: constraints.maxHeight * 0.6,
+                child: Image.asset(
+                  "resources/images/waiting.png",
+                  fit: BoxFit.cover,
+                )),
+          ],
+        );
+      });
     }
   }
 }
@@ -52,6 +53,21 @@ class _TransactionWidget extends StatelessWidget {
   final Function _removeRecord;
 
   _TransactionWidget(this._transaction, this._removeRecord);
+
+  Widget _getDeleteButton(BuildContext context) {
+    if(MediaQuery.of(context).size.width > 360) {
+      return TextButton.icon(
+          onPressed: () => _removeRecord(_transaction),
+          icon: Icon(Icons.delete),
+          label: Text("Delete"),
+      );
+    } else {
+      return IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () => _removeRecord(_transaction),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +91,7 @@ class _TransactionWidget extends StatelessWidget {
           DateFormat.yMMMMd("ru").format(_transaction.date),
           style: TextStyle(fontStyle: FontStyle.italic, color: Colors.blueGrey),
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.delete),
-          onPressed: () => _removeRecord(_transaction),
-        ),
+        trailing: _getDeleteButton(context),
       ),
     );
   }

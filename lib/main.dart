@@ -1,7 +1,7 @@
 import 'package:expense_planner/widgets/add_transaction.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 import './model/transaction.dart';
 import './widgets/chart.dart';
@@ -10,6 +10,15 @@ import './widgets/transactions_list.dart';
 void main() {
   runApp(MyApp());
 }
+
+// void main() {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   SystemChrome.setPreferredOrientations([
+//     DeviceOrientation.portraitUp,
+//     DeviceOrientation.portraitDown
+//   ]);
+//   runApp(MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   @override
@@ -49,6 +58,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
+  var _childToShow = _MainChildren.TRANSACTION_LIST;
 
   void _addRecord(String title, double amount, DateTime date) {
     setState(() => _transactions.insert(
@@ -57,12 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
             id: _transactions.length + 1,
             title: title,
             amount: amount,
-            date: date
-        )));
+            date: date)));
   }
 
   void _removeRecord(Transaction transaction) {
-    //_transactions.removeWhere((element) => false);
     setState(() => _transactions.remove(transaction));
   }
 
@@ -82,27 +90,74 @@ class _MyHomePageState extends State<MyHomePage> {
     return _transactions.where((tr) => tr.date.isAfter(weekAgo)).toList();
   }
 
+  List<Widget> _children(BuildContext context, double _freeHeightSpace) {
+    List<Widget> result = [];
+    Orientation orientation = MediaQuery.of(context).orientation;
+
+    if (orientation == Orientation.landscape) {
+      result.add(Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Show Chart"),
+          Switch(
+            value: _childToShow == _MainChildren.CHART,
+            onChanged: (value) {
+              setState(() {
+                _childToShow = value
+                    ? _MainChildren.CHART
+                    : _MainChildren.TRANSACTION_LIST;
+              });
+            },
+          ),
+        ],
+      ));
+    }
+
+    if (orientation == Orientation.portrait ||
+        _childToShow == _MainChildren.CHART) {
+      result.add(Container(
+        height: orientation == Orientation.portrait
+            ? _freeHeightSpace * 0.3
+            : _freeHeightSpace * 0.7,
+        child: Chart(_recentTransactions),
+      ));
+    }
+
+    if (orientation == Orientation.portrait ||
+        _childToShow == _MainChildren.TRANSACTION_LIST) {
+      result.add(Container(
+        height: _freeHeightSpace * 0.7,
+        child: TransactionsListWidget(_transactions, _removeRecord),
+      ));
+    }
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting();
     Intl.defaultLocale = "ru";
 
+    final _appBar = AppBar(
+      title: Text("Flutter App"),
+      actions: [
+        IconButton(
+          onPressed: () => _showForm(context),
+          icon: Icon(Icons.add),
+        )
+      ],
+    );
+
+    final _freeHeightSpace = MediaQuery.of(context).size.height -
+        _appBar.preferredSize.height -
+        MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Flutter App"),
-        actions: [
-          IconButton(
-            onPressed: () => _showForm(context),
-            icon: Icon(Icons.add),
-          )
-        ],
-      ),
+      appBar: _appBar,
       body: SingleChildScrollView(
         child: Column(
-          children: <Widget>[
-            Chart(_recentTransactions),
-            TransactionsListWidget(_transactions, _removeRecord),
-          ],
+          children: _children(context, _freeHeightSpace),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -112,3 +167,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+enum _MainChildren { CHART, TRANSACTION_LIST }

@@ -52,28 +52,35 @@ class _AddTransactionWidgetState extends State<AddTransactionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        child: Column(
-          children: [
-            _CustomTextField(
-              label: "Наименование",
-              controller: _titleController,
-              onSubmit: _prepareAndAddRecord,
-            ),
-            _CustomTextField(
-              label: "Цена",
-              controller: _amountController,
-              inputType: TextInputType.number,
-              onSubmit: _prepareAndAddRecord,
-            ),
-            _DateField(_showDatePicker, _dateController),
-            _AddTransactionButton(_prepareAndAddRecord),
-          ],
-          crossAxisAlignment: CrossAxisAlignment.end,
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Container(
+          child: Column(
+            children: [
+              _CustomTextField(
+                label: "Наименование",
+                controller: _titleController,
+                onSubmit: _prepareAndAddRecord,
+              ),
+              _CustomTextField(
+                label: "Цена",
+                controller: _amountController,
+                inputType: TextInputType.number,
+                onSubmit: _prepareAndAddRecord,
+              ),
+              _DateField(_showDatePicker, _dateController),
+              _AddTransactionButton(_prepareAndAddRecord),
+            ],
+            crossAxisAlignment: CrossAxisAlignment.end,
+          ),
+          padding: EdgeInsets.only(
+            top: 10,
+            left: 10,
+            right: 10,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+          ),
         ),
-        padding: EdgeInsets.all(10),
       ),
     );
   }

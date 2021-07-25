@@ -10,51 +10,56 @@ class ChartBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            height: 20,
-            child: FittedBox(
-              child: Text("\$${_record.amount.toStringAsFixed(0)}"),
+    return LayoutBuilder(builder: (ctx, constraints) {
+      return Container(
+        child: Column(
+          children: [
+            Container(
+              height: constraints.maxHeight * 0.15,
+              child: FittedBox(
+                child: Text("\$${_record.amount.toStringAsFixed(0)}"),
+              ),
             ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Container(
-            height: 60,
-            width: 20,
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1),
-                    color: Color.fromRGBO(220, 220, 220, 1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                FractionallySizedBox(
-                  heightFactor: _percent * 0.01,
-                  widthFactor: 1,
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
+            SizedBox(
+              height: constraints.maxHeight * 0.05,
+            ),
+            Container(
+              height: constraints.maxHeight * 0.6,
+              width: 20,
+              child: Stack(
+                children: [
+                  Container(
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      border: Border.all(color: Colors.black, width: 1),
+                      color: Color.fromRGBO(220, 220, 220, 1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                ),
-              ],
+                  FractionallySizedBox(
+                    heightFactor: _percent * 0.01,
+                    widthFactor: 1,
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      alignment: Alignment.bottomCenter,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Text("${_record.day}"),
-        ],
-      ),
-    );
+            SizedBox(
+              height: constraints.maxHeight * 0.05,
+            ),
+            Container(
+              height: constraints.maxHeight * 0.15,
+              child: FittedBox(child: Text("${_record.day}")),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
